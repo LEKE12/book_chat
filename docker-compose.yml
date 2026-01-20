@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: book_chat_app
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./storage:/app/storage
+    command: python -m src
