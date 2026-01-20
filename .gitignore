@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Data & storage (keep folders only)
+data/*
+storage/*
+!data/.gitkeep
+!storage/.gitkeep
+
+# Env
+.env
