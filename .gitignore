@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OS
 .DS_Store
 
@@ -15,3 +16,6 @@ storage/*
 
 # Env
 .env
+=======
+.DS_Store
+>>>>>>> 4ea33fe (adding gitigore and remove DS_store)
