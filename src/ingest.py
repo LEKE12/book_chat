@@ -5,11 +5,14 @@ from docling.document_converter import DocumentConverter
 
 
 #source = r"data/01-11-2020-203418Zero to One.pdf"
-path = r"/Users/lekeadako/Documents/portfolio projects/Book_chat/books"
+path = r"/Users/lekeadako/Documents/portfolio projects/Book_chat"
+books = r"books"
+data = r"data"
 
 def convet_to_md(path):
-    for file_name in os.listdir(path):
-        full_path = os.path.join(path,file_name)
+    for file_name in os.listdir(os.path.join(path,books)):
+        full_path = os.path.join(path,books,file_name)
+        print(full_path)
 
         if os.path.isfile(full_path):
             exten = os.path.splitext(file_name)[1].lower()
@@ -20,7 +23,7 @@ def convet_to_md(path):
         
                 doc = converter.convert(full_path).document
                 md_text = doc.export_to_markdown()
-                output_path = os.path.join(r'/Users/lekeadako/Documents/portfolio projects/Book_chat/data',filename + '.md')
+                output_path = os.path.join(path , data,filename + '.md')
 
                 try:
                     with open(output_path, 'w', encoding='utf-8') as file:
