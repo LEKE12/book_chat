@@ -1,9 +1,75 @@
+# services:
+#   app:
+#     build: .
+#     container_name: book_chat_app
+#     volumes:
+#       - .:/app
+#       - ./data:/app/data
+#       - ./storage:/app/storage
+#     command: python -m src
+
+
+version: "3.8"
+
 services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: etcd
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    command: >
+      etcd
+      -advertise-client-urls=http://0.0.0.0:2379
+      -listen-client-urls=http://0.0.0.0:2379
+      --data-dir=/etcd
+    volumes:
+      - ./storage/etcd:/etcd
+    ports:
+      - "2379:2379"
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: minio
+    environment:
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    command: minio server /minio_data --console-address ":9001"
+    volumes:
+      - ./storage/minio:/minio_data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  milvus:
+    image: milvusdb/milvus:v2.4.4
+    container_name: milvus
+    depends_on:
+      - etcd
+      - minio
+    environment:
+      - ETCD_ENDPOINTS=etcd:2379
+      - MINIO_ADDRESS=minio:9000
+    command: ["milvus", "run", "standalone"]
+    volumes:
+      - ./storage/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+
   app:
     build: .
     container_name: book_chat_app
+    depends_on:
+      - milvus
+    environment:
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - MILVUS_COLLECTION=book_chunks
+      - EMBED_DIM=384
     volumes:
       - .:/app
-      - ./data:/app/data
-      - ./storage:/app/storage
-    command: python -m src
+    working_dir: /app
+    command: ["python", "-m", "src"]

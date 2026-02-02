@@ -1,0 +1,6 @@
+docling
+pymilvus>=2.4.0
+sentence-transformers>=2.2.2
+numpy
+pandas
+jsonl
